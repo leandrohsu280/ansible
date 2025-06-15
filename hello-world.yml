@@ -1,0 +1,40 @@
+---
+- name: Hello World Playbook
+  hosts: managed_nodes
+  gather_facts: yes
+  tasks:
+    - name: Echo Hello World from each node
+      shell: echo "Hello World from $(hostname)!"
+      register: hello_output
+    
+    - name: Display the Hello World output
+      debug:
+        msg: "{{ inventory_hostname }} says: {{ hello_output.stdout }}"
+    
+    - name: Show additional system info
+      shell: echo "I am $(whoami) on $(hostname) at $(date)"
+      register: system_info
+    
+    - name: Display system information
+      debug:
+        msg: "System Info - {{ system_info.stdout }}"
+    
+    - name: Create a hello file on each node
+      copy:
+        content: |
+          Hello World!
+          This file was created by Ansible on {{ inventory_hostname }}
+          Timestamp: {{ ansible_date_time.iso8601 }}
+          IP Address: {{ ansible_default_ipv4.address | default('N/A') }}
+        dest: /tmp/hello_world.txt
+        mode: '0644'
+    
+    - name: Read the hello file back
+      shell: cat /tmp/hello_world.txt
+      register: file_content
+    
+    - name: Show file contents
+      debug:
+        msg: |
+          File contents from {{ inventory_hostname }}:
+          {{ file_content.stdout }}
