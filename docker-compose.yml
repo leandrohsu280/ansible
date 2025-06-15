@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  managed-node-1:
+    build: 
+      context: ./managed
+      dockerfile: Dockerfile
+    container_name: ansible-node-1
+    hostname: node1
+    ports:
+      - "2222:22"
+    volumes:
+      - ./shared:/shared
+    networks:
+      ansible-lab:
+        ipv4_address: 172.20.0.10
+
+  managed-node-2:
+    build:
+      context: ./managed
+      dockerfile: Dockerfile
+    container_name: ansible-node-2
+    hostname: node2
+    ports:
+      - "2223:22"
+    volumes:
+      - ./shared:/shared
+    networks:
+      ansible-lab:
+        ipv4_address: 172.20.0.11
+
+  managed-node-3:
+    build:
+      context: ./managed
+      dockerfile: Dockerfile
+    container_name: ansible-node-3
+    hostname: node3
+    ports:
+      - "2224:22"
+    volumes:
+      - ./shared:/shared
+    networks:
+      ansible-lab:
+        ipv4_address: 172.20.0.12
+
+networks:
+  ansible-lab:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
