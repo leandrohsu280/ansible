@@ -1,0 +1,18 @@
+# eda/rulebooks/redis_sentinel_monitor.yml
+- name: Monitor Redis with Webhook
+  hosts: all
+  sources:
+    - ansible.eda.webhook:
+        port: 5000
+
+  rules:
+    - name: Print the raw event
+      condition: event.payload is defined
+      actions:
+        - debug:
+            msg: "Received event: {{ event }}"
+        - run_playbook:
+            name: eda/playbooks/restart_redis.yml
+            extra_vars:
+              event_data: "{{ event.payload }}"
+

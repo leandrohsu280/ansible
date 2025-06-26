@@ -1,0 +1,12 @@
+bind 0.0.0.0
+port 6379
+
+dir /var/lib/redis
+appendonly yes
+protected-mode no
+
+# If not the master node, make it a replica
+{% if inventory_hostname != 'node1' %}
+replicaof {{ master_ip }} 6379
+{% endif %}
+

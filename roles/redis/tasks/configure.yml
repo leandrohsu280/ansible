@@ -1,0 +1,23 @@
+- name: Kill existing Redis
+  shell: "pkill redis-server || true"
+  ignore_errors: yes
+
+- name: Create Redis data directory
+  file:
+    path: /var/lib/redis
+    state: directory
+    owner: redis
+    group: redis
+    mode: '0755'
+
+- name: Copy redis.conf
+  template:
+    src: redis.conf.j2
+    dest: /etc/redis/redis.conf
+
+- name: Start Redis manually
+  shell: "nohup redis-server /etc/redis/redis.conf > /var/log/redis.log 2>&1 &"
+  args:
+    executable: /bin/bash
+  ignore_errors: yes
+
