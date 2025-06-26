@@ -1,0 +1,37 @@
+- name: Restart Redis on node
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: I am in the playbook!
+      debug:
+        msg: "Triggered on host {{ inventory_hostname }} with event host {{ event_data.host }}"
+
+    - name: Debug inventory hostname
+      debug:
+        msg: "Current host: {{ inventory_hostname }}"
+
+    - name: Debug target host from event
+      debug:
+        msg: "Target host from event: {{ event_data.host | default('NOT_FOUND') }}"
+
+    - name: Check if this is the target host
+      debug:
+        msg: "Host match: {{ inventory_hostname == event_data.host }}"
+
+    - name: Restart Redis using redis-server
+      shell: redis-server &
+      when: inventory_hostname == event_data.host
+      register: restart_result
+
+    - name: Show restart result
+      debug:
+        var: restart_result
+      when: inventory_hostname == event_data.host
+
+    - name: Wait for Redis port
+      wait_for:
+        port: 6379
+        state: started
+        timeout: 30
+      when: inventory_hostname == event_data.host
+

@@ -1,0 +1,8 @@
+- host: node1
+  reason: DOWN
+  timestamp: "2025-06-25T06:09:00Z"
+  source: manual_test
+  details:
+    role: master
+    port: 6379
+

@@ -1,0 +1,15 @@
+- name: Kill existing Sentinel
+  shell: "pkill redis-sentinel || true"
+  ignore_errors: yes
+
+- name: Copy sentinel.conf
+  template:
+    src: sentinel.conf.j2
+    dest: /etc/redis/sentinel.conf
+
+- name: Start Sentinel manually
+  shell: "nohup redis-sentinel /etc/redis/sentinel.conf > /var/log/sentinel.log 2>&1 &"
+  args:
+    executable: /bin/bash
+  ignore_errors: yes
+

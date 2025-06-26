@@ -1,0 +1,30 @@
+- name: Check Redis + Sentinel Cluster Status
+  hosts: managed_nodes
+  become: true
+  tasks:
+
+    - name: Get Redis role and replication info
+      shell: redis-cli info replication
+      register: redis_info
+      ignore_errors: true
+
+    - name: Restart Redis if not running
+      shell: "nohup redis-server /etc/redis/redis.conf > /var/log/redis.log 2>&1 &"
+      when: redis_info.failed
+      ignore_errors: yes
+
+    - name: Re-check Redis role after restart
+      shell: redis-cli info replication
+      when: redis_info.failed
+      register: redis_info_retry
+
+    - name: Show Redis info (original or retry)
+      debug:
+        var: redis_info.stdout_lines
+      when: not redis_info.failed
+
+    - name: Show Redis info after retry
+      debug:
+        var: redis_info_retry.stdout_lines
+      when: redis_info.failed
+
